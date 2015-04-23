@@ -4,7 +4,7 @@
  * PharTools (v1.0) by EvolSoft
  * Developer: EvolSoft (Flavius12)
  * Website: http://www.evolsoft.tk
- * Date: 23/04/2015 08:02 PM (UTC)
+ * Date: 23/04/2015 08:15 PM (UTC)
  * Copyright & License: (C) 2015 EvolSoft
  * Licensed under MIT (https://github.com/EvolSoft/PharTools/blob/master/LICENSE)
  */
@@ -180,7 +180,7 @@ if(isset($argv[1])){
 					echo "Size: " . intval((filesize($file) * .0009765625) * .0009765625) ." MB (" . intval(filesize($file) * .0009765625) . " KB)\n";
 					echo "Signature: " . $phar->getSignature()["hash"] . "\n";
 					echo "Signature type: " . $phar->getSignature()["hash_type"] . "\n";
-					echo "Stub: " . $phar->getStub();
+					echo "Stub: " . $phar->getStub() . "\n";
 					echo "Writable: " . strbool($phar->isWritable()) . "\n";
 					echo "Readable: " . strbool($phar->isReadable()) . "\n";
 					echo "Metadata: " . $metadata;
