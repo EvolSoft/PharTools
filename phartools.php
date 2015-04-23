@@ -4,7 +4,7 @@
  * PharTools (v1.0) by EvolSoft
  * Developer: EvolSoft (Flavius12)
  * Website: http://www.evolsoft.tk
- * Date: 23/04/2015 07:55 PM (UTC)
+ * Date: 23/04/2015 08:02 PM (UTC)
  * Copyright & License: (C) 2015 EvolSoft
  * Licensed under MIT (https://github.com/EvolSoft/PharTools/blob/master/LICENSE)
  */
@@ -33,7 +33,7 @@ if(isset($argv[1])){
 				$compression = null;
 				for($i = 0; $i < count($params) - 1; $i++){
 					//Check Compression
-					if($params[$i] == "-c" && substr($params[$i + 1], 1) != "-"){
+					if($params[$i] == "-c" && substr($params[$i + 1], 0, 1) != "-"){
 						if(strtolower($params[$i + 1]) == "gzip" || strtolower($params[$i + 1]) == "gz"){
 							$compression = Phar::GZ;
 						}elseif(strtolower($params[$i + 1]) == "bzip2" || strtolower($params[$i + 1]) == "bz2"){
@@ -43,15 +43,15 @@ if(isset($argv[1])){
 						}
 					}
 					//Check Metadata
-					if($params[$i] == "-m" && substr($params[$i + 1], 1) != "-"){
+					if($params[$i] == "-m" && substr($params[$i + 1], 0, 1) != "-"){
 						$metadata = stringToMetadata($params[$i + 1]);
 					}
 					//Check Stub
-					if($params[$i] == "-s" && substr($params[$i + 1], 1) != "-"){
+					if($params[$i] == "-s" && substr($params[$i + 1], 0, 1) != "-"){
 						$stub = $params[$i + 1];
 					}
 					//Check Regex
-					if($params[$i] == "-r" && substr($params[$i + 1], 1) != "-"){
+					if($params[$i] == "-r" && substr($params[$i + 1], 0, 1) != "-"){
 						$regex = $params[$i + 1];
 					}
 				}
