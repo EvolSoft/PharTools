@@ -4,10 +4,12 @@
  * PharTools (v1.0) by EvolSoft
  * Developer: EvolSoft (Flavius12)
  * Website: http://www.evolsoft.tk
- * Date: 23/04/2015 08:15 PM (UTC)
+ * Date: 23/04/2015 02:25 PM (UTC)
  * Copyright & License: (C) 2015 EvolSoft
  * Licensed under MIT (https://github.com/EvolSoft/PharTools/blob/master/LICENSE)
  */
+ 
+error_reporting(E_NOTICE); //Comment this line to enable error reporting
 
 echo "EvolSoft PharTools v1.0\n";
 if(version_compare(phpversion(), "5.3.0", "<")){
@@ -32,27 +34,39 @@ if(isset($argv[1])){
 				$metadata = null;
 				$compression = null;
 				for($i = 0; $i < count($params) - 1; $i++){
-					//Check Compression
-					if($params[$i] == "-c" && substr($params[$i + 1], 0, 1) != "-"){
-						if(strtolower($params[$i + 1]) == "gzip" || strtolower($params[$i + 1]) == "gz"){
-							$compression = Phar::GZ;
-						}elseif(strtolower($params[$i + 1]) == "bzip2" || strtolower($params[$i + 1]) == "bz2"){
-							$compression = Phar::BZ2;
+					if($params[$i] == "-c"){ //Check Compression
+						if(substr($params[$i + 1], 0, 1) != "-"){
+							if(strtolower($params[$i + 1]) == "gzip" || strtolower($params[$i + 1]) == "gz"){
+								$compression = Phar::GZ;
+							}elseif(strtolower($params[$i + 1]) == "bzip2" || strtolower($params[$i + 1]) == "bz2"){
+								$compression = Phar::BZ2;
+							}else{
+								$compression = null;
+							}
 						}else{
-							$compression = null;
+							echo "Invalid compression specified!\n";
 						}
-					}
-					//Check Metadata
-					if($params[$i] == "-m" && substr($params[$i + 1], 0, 1) != "-"){
-						$metadata = stringToMetadata($params[$i + 1]);
-					}
-					//Check Stub
-					if($params[$i] == "-s" && substr($params[$i + 1], 0, 1) != "-"){
-						$stub = $params[$i + 1];
-					}
-					//Check Regex
-					if($params[$i] == "-r" && substr($params[$i + 1], 0, 1) != "-"){
-						$regex = $params[$i + 1];
+
+					}elseif($params[$i] == "-m"){ //Check Metadata
+						if(substr($params[$i + 1], 0, 1) != "-"){
+							$metadata = stringToMetadata($params[$i + 1]);
+						}else{
+							echo "Invalid metadata specified!\n";
+						}
+					}elseif($params[$i] == "-s"){ //Check Stub
+						if(substr($params[$i + 1], 0, 1) != "-"){
+							$stub = $params[$i + 1];
+						}else{
+							echo "Invalid stub specified!\n";
+						}
+					}elseif($params[$i] == "-r"){ //Check Regex
+						if(substr($params[$i + 1], 0, 1) != "-"){
+							$regex = $params[$i + 1];
+						}else{
+							echo "Invalid regular expression specified!\n";
+						}
+					}elseif(substr($params[$i], 0, 1) == "-"){ //Check if is a option
+						echo "\"" . $params[$i] . "\" option not recognized\n";
 					}
 				}
 				if(file_exists($argv[2])){
@@ -93,7 +107,12 @@ if(isset($argv[1])){
 					if(is_dir($argv[2])){
 						//Check regex
 						if($regex != null){
-							$phar->buildFromDirectory(getcwd() . "/" . $argv[2], $regex);
+							if(isRegexValid($regex)){
+								$phar->buildFromDirectory(getcwd() . "/" . $argv[2], $regex);
+							}else{
+								echo "\nInvalid regular expression specified!";
+								$phar->buildFromDirectory(getcwd() . "/" . $argv[2]);
+							}
 						}else{
 							$phar->buildFromDirectory(getcwd() . "/" . $argv[2]);
 						}
@@ -231,5 +250,13 @@ function stringToMetadata($string){
 		$data[$tmp[0]] = $tmp[1];
 	}
 	return $data;
+}
+
+function isRegexValid($exp){
+	if(@preg_match($exp, "") === false) {
+		return false;
+	}else{
+		return true;
+	}
 }
 ?>
