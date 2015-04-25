@@ -4,7 +4,7 @@
  * PharTools (v1.0) by EvolSoft
  * Developer: EvolSoft (Flavius12)
  * Website: http://www.evolsoft.tk
- * Date: 23/04/2015 02:25 PM (UTC)
+ * Date: 25/04/2015 12:00 AM (UTC)
  * Copyright & License: (C) 2015 EvolSoft
  * Licensed under MIT (https://github.com/EvolSoft/PharTools/blob/master/LICENSE)
  */
@@ -33,7 +33,7 @@ if(isset($argv[1])){
 				$regex = null;
 				$metadata = null;
 				$compression = null;
-				for($i = 0; $i < count($params) - 1; $i++){
+				for($i = 0; $i <= count($params) - 1; $i++){
 					if($params[$i] == "-c"){ //Check Compression
 						if(substr($params[$i + 1], 0, 1) != "-"){
 							if(strtolower($params[$i + 1]) == "gzip" || strtolower($params[$i + 1]) == "gz"){
@@ -65,8 +65,16 @@ if(isset($argv[1])){
 						}else{
 							echo "Invalid regular expression specified!\n";
 						}
-					}elseif(substr($params[$i], 0, 1) == "-"){ //Check if is a option
-						echo "\"" . $params[$i] . "\" option not recognized\n";
+					}else{
+						if($i == count($params)){
+							if(substr($params[$i + 1], 0, 1) == "-"){ //Check if is a option
+								echo "\"" . $params[$i + 1] . "\" option not recognized\n";
+							}
+						}else{
+							if(substr($params[$i], 0, 1) == "-"){ //Check if is a option
+								echo "\"" . $params[$i] . "\" option not recognized\n";
+							}
+						}
 					}
 				}
 				if(file_exists($argv[2])){
