@@ -4,7 +4,7 @@
  * PharTools (v1.0) by EvolSoft
  * Developer: EvolSoft (Flavius12)
  * Website: http://www.evolsoft.tk
- * Date: 25/04/2015 12:00 AM (UTC)
+ * Date: 26/04/2015 08:27 PM (UTC)
  * Copyright & License: (C) 2015 EvolSoft
  * Licensed under MIT (https://github.com/EvolSoft/PharTools/blob/master/LICENSE)
  */
@@ -204,13 +204,18 @@ if(isset($argv[1])){
 					}else{
 						$metadata = "No metadata found\n";
 					}
-					echo "Size: " . intval((filesize($file) * .0009765625) * .0009765625) ." MB (" . intval(filesize($file) * .0009765625) . " KB)\n";
+					echo "Size: " . round((filesize($file) * .0009765625) * .0009765625, 2) ." MB (" . round(filesize($file) * .0009765625, 3) . " KB)\n";
 					echo "Signature: " . $phar->getSignature()["hash"] . "\n";
 					echo "Signature type: " . $phar->getSignature()["hash_type"] . "\n";
-					echo "Stub: " . $phar->getStub() . "\n";
 					echo "Writable: " . strbool($phar->isWritable()) . "\n";
 					echo "Readable: " . strbool($phar->isReadable()) . "\n";
 					echo "Metadata: " . $metadata;
+					echo "Show stub (y, n)? ";
+					$input = fopen("php://stdin","r");
+					$line = fgets($input);
+					if(trim($line) == 'y'){
+						echo $phar->getStub();
+					}
 				}catch(Exception $e){
 					echo "Invalid phar file";
 				}
