@@ -104,6 +104,6 @@ PharTools_v1.0_win_portable (Preconfigured Script + Precompiled PHP binaries, No
 
 ##Contributing
 
-If you want to contribute to this project please follow the [Contribution Guidelines](https://github.com/EvolSoft/PharTools/blob/master/CONTRIBUTING.MD)
+If you want to contribute to this project please follow the [Contribution Guidelines](https://github.com/EvolSoft/PharTools/blob/master/CONTRIBUTING.md)
 
 
