@@ -4,7 +4,7 @@
  * PharTools (v1.0) by EvolSoft
  * Developer: EvolSoft (Flavius12)
  * Website: http://www.evolsoft.tk
- * Date: 26/04/2015 08:27 PM (UTC)
+ * Date: 01/05/2015 05:45 PM (UTC)
  * Copyright & License: (C) 2015 EvolSoft
  * Licensed under MIT (https://github.com/EvolSoft/PharTools/blob/master/LICENSE)
  */
@@ -124,17 +124,17 @@ if(isset($argv[1])){
 						}else{
 							$phar->buildFromDirectory(getcwd() . "/" . $argv[2]);
 						}
-						echo "\nPhar file created in " . getcwd() . "!";
+						echo "\nPhar file created in " . getcwd() . "!\n";
 					}else{
 						if(file_exists($argv[2])){
 							$phar->addFile($argv[2]);
-							echo "\nPhar file created in " . getcwd() . "!";
+							echo "\nPhar file created in " . getcwd() . "!\n";
 						}else{
-							echo "\nSource not found error";
+							echo "\nSource not found error\n";
 						}
 					}
 				}else{
-					echo "\nSource not found error";
+					echo "\nSource not found error\n";
 				}
 			}else{
 				echo "Usage: -c <source_path|source_file> <destination_phar> [options]\n";
@@ -142,7 +142,7 @@ if(isset($argv[1])){
 				echo "-c gzip|bzip2 Compress the phar file using gzip or bzip2 compression\n";
 				echo "-m <metadata> Add metadata to the phar file (metadata format must be like 'key=>value,key2=>value2'\n";
 				echo "-s <stub> Set stub string for the phar\n";
-				echo "-r <regex> Include only files matching the regular expression";
+				echo "-r <regex> Include only files matching the regular expression\n";
 			}
 		}else{
 			echo "Phar creation is disabled in php.ini config. Please enable it to create Phar archives\n";
@@ -162,31 +162,31 @@ if(isset($argv[1])){
 						if(is_dir($argv[3])){
 							echo "Extracting...";
 							$phar->extractTo($argv[3], null, true);
-							echo "\nExtracted in " . $argv[3] . "!";
+							echo "\nExtracted in " . $argv[3] . "!\n";
 						}else{
 							$dir = @mkdir($argv[3]);
 							//Check directory
 							if($dir){
 								echo "Extracting...";
 								$phar->extractTo($argv[3], null, true);
-								echo "\nExtracted in " . $argv[3] . "!";
+								echo "\nExtracted in " . $argv[3] . "!\n";
 							}else{
-								echo "I/O Error";
+								echo "I/O Error\n";
 							}
 						}
 					}else{
 						echo "Extracting...";
 						$phar->extractTo(getcwd(), null, true);
-						echo "\nExtracted in " . getcwd() . "!";
+						echo "\nExtracted in " . getcwd() . "!\n";
 					}
 				}catch(Exception $e){
-					echo "Invalid phar file";
+					echo "Invalid phar file\n";
 				}
 			}else{
-				echo "File not found";
+				echo "File not found\n";
 			}
 		}else{
-			echo "Usage: -e <phar_file> [extract_directory]";
+			echo "Usage: -e <phar_file> [extract_directory]\n";
 		}
 	}elseif(strtolower($argv[1]) == "-i"){ //PharTools Info command
 		if(isset($argv[2])){
@@ -216,14 +216,15 @@ if(isset($argv[1])){
 					if(trim($line) == 'y'){
 						echo $phar->getStub();
 					}
+					echo "\n";
 				}catch(Exception $e){
-					echo "Invalid phar file";
+					echo "Invalid phar file\n";
 				}
 			}else{
-				echo "File not found";
+				echo "File not found\n";
 			}
 		}else{
-			echo "Usage: -i <phar>";
+			echo "Usage: -i <phar_file>\n";
 		}
 	}elseif(strtolower($argv[1]) == "-v"){ //PharTools Version command
 		echo "EvolSoft website: http://www.evolsoft.tk\n";
