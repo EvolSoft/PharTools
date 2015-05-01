@@ -19,19 +19,6 @@ PHP >= 5.3.0<br>
 
 ***To create phar files you need to set php.readonly to 0 in php.ini configuration***
 
-## Usage Example
-
-###### Windows
-
-*1. Open Windows Command Shell*<br>
-![1](https://cloud.githubusercontent.com/assets/10297075/7434716/2d8a500c-f03d-11e4-84c2-9ef8ab6fee5d.png)<br>
-*2. Go on PharTools directory*<br>
-![2](https://cloud.githubusercontent.com/assets/10297075/7434729/61c77962-f03d-11e4-89cb-a78ba782f9be.png)<br>
-*3. Run PharTools*<br>
-![3](https://cloud.githubusercontent.com/assets/10297075/7434743/7b4bbf06-f03d-11e4-83df-493a92ac7075.png)<br>
-
-###### Linux
-
 ## Documentation
 
 **Configuration:**
@@ -114,6 +101,19 @@ PharTools_v1.0_win_installer (Preconfigured Script + Precompiled PHP binaries)
 PharTools_v1.0_win_portable (Preconfigured Script + Precompiled PHP binaries, No Installer)
 
 ***Please note that precompiled PHP binaries provided in the Portable and Installer versions are provided with minimal extensions and configuration***
+
+## Usage Example
+
+###### Windows
+
+*1. Open Windows Command Shell*<br>
+![1](https://cloud.githubusercontent.com/assets/10297075/7434716/2d8a500c-f03d-11e4-84c2-9ef8ab6fee5d.png)<br>
+*2. Go on PharTools directory*<br>
+![2](https://cloud.githubusercontent.com/assets/10297075/7434729/61c77962-f03d-11e4-89cb-a78ba782f9be.png)<br>
+*3. Run PharTools*<br>
+![3](https://cloud.githubusercontent.com/assets/10297075/7434743/7b4bbf06-f03d-11e4-83df-493a92ac7075.png)<br>
+
+###### Linux
 
 ##Contributing
 
