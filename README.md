@@ -17,6 +17,8 @@ PHP >= 5.3.0<br>
 
 ***Don't run this script directly. Run it from a cmd.exe or from a Linux Terminal instance instead***
 
+***If you install PharTools on Windows directories (like Program Files, Program Files (x86), ...) you need to run cmd.exe as Administrator***
+
 ***To create phar files you need to set php.readonly to 0 in php.ini configuration***
 
 ## Documentation
