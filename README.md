@@ -45,7 +45,7 @@ To create phar files use the -c command
 
 **Options:**<br>
 -c gzip|bzip2 Compress the phar file using gzip or bzip2 compression<br>
--m <metadata> Add metadata to the phar file (metadata format must be like 'key=>value,key2=>value2'<br>
+-m <metadata> Add metadata to the phar file (metadata format must be like 'key=>value,key2=>value2')<br>
 -s <stub> Set stub string for the phar<br>
 -r <regex> Include only files matching the regular expression<br>
 
