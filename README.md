@@ -124,7 +124,7 @@ PharTools_v1.0_win_portable (Preconfigured Script + Precompiled PHP binaries, No
 *3. Run PharTools*<br>
 ![3 2](https://cloud.githubusercontent.com/assets/10297075/7435030/126e09dc-f040-11e4-84f2-d4c19d9ee5ae.png)<br>
 
-##Contributing
+## Contributing
 
 If you want to contribute to this project please follow the [Contribution Guidelines](https://github.com/EvolSoft/PharTools/blob/master/CONTRIBUTING.md)
 
