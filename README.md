@@ -94,6 +94,7 @@ Currently supported *compression* types are gzip and bzip2
 *phartools -p2a &lt;phar_archive&gt; [options]*
 
 *options* switches:
+
 -zgzip|-zbzip2 Set output compression type<br>
 -ozip|-otar Set output archive type
 
