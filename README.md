@@ -9,7 +9,8 @@
 - *Extract* phar archives
 - *Add, rename, delete, list* files inside phar archives
 - *Get informations* about phar archives (such as filesize, metadata, stub, etc...)
-- *Converts* zip or tar archives to phar archives and vice versa
+- *Converts* zip or tar archives to phar archives
+- *Converts* phar archives to zip or tar archives
 - *Supports* GZip and BZip2 compression types (BZip2 needs the php_bz2 extension which is already included on the Windows installer)
 
 ***Don't run this script directly. Run it from a cmd.exe or from a Linux Terminal instance instead***
@@ -42,55 +43,55 @@ If you are running PharTools on Windows you can simply run it calling *phartools
 
 #### Add a file to a phar archive:
 
-*phartools -a <phar_archive> <file>*
+*phartools -a &lt;phar_archive&gt; &lt;file&gt;*
 
 *file* can be either a file or a non-empty directory.
 
 #### Create a phar archive:
 
-*phartools -c <destination_phar> <source_dir | source_file> [options]*
+*phartools -c &lt;destination_phar&gt; &lt;source_dir | source_file&gt; [options]*
 
 *options* switches:
 
 -zgzip|-zbzip2 Compress the phar file using gzip or bzip2 compression
--m<metadata> Add metadata to the phar file (metadata format must be like 'key=>value,key2=>value2')
--s<stub> Set stub string for the phar
--r<regex> Include only files matching the regular expression
+-m&lt;metadata&gt; Add metadata to the phar file (metadata format must be like 'key=&gt;value,key2=&gt;value2')
+-s&lt;stub&gt; Set stub string for the phar
+-r&lt;regex&gt; Include only files matching the regular expression
 
 #### Delete a file from a phar archive:
 
-*phartools -d <phar_archive> <file>*
+*phartools -d &lt;phar_archive&gt; &lt;file&gt;*
 
 *file* can be either a file or a directory.
 
 #### Extract a phar archive:
 
-*phartools -e <phar_archive> [extract_path]*
+*phartools -e &lt;phar_archive&gt; [extract_path]*
 
 If *extract_path* is not specified, the archive will be extracted in the current directory
 
 #### Get informations of a phar archive:
 
-*phartools -i <phar_archive>*
+*phartools -i &lt;phar_archive&gt;*
 
 #### List files inside a phar archive:
 
-*phartools -l <phar_archive>*
+*phartools -l &lt;phar_archive&gt;*
 
 #### Rename a file into a phar archive:
 
-*phartools -r <phar_archive> <oldname> <newname>*
+*phartools -r &lt;phar_archive&gt; &lt;oldname&gt; &lt;newname&gt;*
 
 #### Convert zip or tar archive to a phar archive:
 
-*phartools -a2p <archive> [compression]*
+*phartools -a2p &lt;archive&gt; [compression]*
 
 Currently supported *compression* types are gzip and bzip2
 
 
 #### Convert a phar archive to a zip or tar archive:
 
-*phartools -p2a <phar_archive> [options]*
+*phartools -p2a &lt;phar_archive&gt; [options]*
 
 *options* switches:
 -zgzip|-zbzip2 Set output compression type
