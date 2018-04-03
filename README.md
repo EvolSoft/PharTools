@@ -1,112 +1,117 @@
 ![start2](https://cloud.githubusercontent.com/assets/10303538/6315586/9463fa5c-ba06-11e4-8f30-ce7d8219c27d.png)
 
-# PharTools
-A powerful PHP-CLI tool to create, extract and get info of phar files
+## PharTools
 
-## Category
+**PharTools** is a powerful PHP-CLI tool to manage phar (PHP-Archive) files. It allows to create, extract, edit and view phar archives. It also includes a simple API to implement PharTools features on your own scripts.
 
-PHP Command Line Interface script
-
-## Requirements
-
-PHP >= 5.3.0<br>
-
-## Overview
-
-**PharTools** is a powerful PHP-CLI tool to create, extract and get info of phar files
+***Features:***
+- *Create* phar archives
+- *Extract* phar archives
+- *Add, rename, delete, list* files inside phar archives
+- *Get informations* about phar archives (such as filesize, metadata, stub, etc...)
+- *Converts* zip or tar archives to phar archives and vice versa
+- *Supports* GZip and BZip2 compression types (BZip2 needs the php_bz2 extension which is already included on the Windows installer)
 
 ***Don't run this script directly. Run it from a cmd.exe or from a Linux Terminal instance instead***
 
-***If you install PharTools on Windows directories (like Program Files, Program Files (x86), ...) you need to run cmd.exe as Administrator***
+***If you install PharTools on Windows directories (like Program Files, Program Files (x86), ...) you may need to run cmd.exe as Administrator***
 
 ***To create phar files you need to set php.readonly to 0 in php.ini configuration***
 
 ## Documentation
 
-**Configuration:**
+### Manual configuration
 
-###### Windows
+#### Windows
 
-To configure PharTools on Windows you need only to edit *%PHP_PATH* and *%PHP_EXE* variables in *phartools.cmd* file where *%PHP_PATH* must be the PHP binaries path and *%PHP_EXE* must be the main PHP executable file (usually *php.exe*)
+To configure PharTools on Windows you need only to edit *%PHP_PATH%* in *phartools.cmd* file by setting the right php executable path.
 
-###### Linux
+#### Linux
 
 On Linux, PharTools usually doesn't require to be configured but if you have some problems, edit *phartools.sh* file.
 
-**Commands:**
+### Commands
 
-If you are running PharTools on Windows you can simply run it calling *phartools.cmd* on Command Shell. On Linux you have to run phartools using *./phartools.sh* instead.
+If you are running PharTools on Windows you can simply run it calling *phartools.cmd* on command shell. On Linux you have to run phartools using *./phartools.sh* instead.
 
-###### Create Phar:
+###### Example
 
-To create phar files use the -c command
+*phartools -h* (Windows)
 
-*phartools -c <source_path|source_file> <destination_phar> [options]*
+*./phartools.sh -h* (Linux)
 
-**Options:**<br>
--c gzip|bzip2 Compress the phar file using gzip or bzip2 compression<br>
--m <metadata> Add metadata to the phar file (metadata format must be like 'key=>value,key2=>value2')<br>
--s <stub> Set stub string for the phar<br>
--r <regex> Include only files matching the regular expression<br>
+#### Add a file to a phar archive:
 
-**Example:**
+*phartools -a <phar_archive> <file>*
 
-phartools -c mysource myphar.phar (Windows)
+*file* can be either a file or a non-empty directory.
 
-./phartools.sh -c mysource myphar.phar (Linux)
+#### Create a phar archive:
 
-###### Extract Phar:
+*phartools -c <destination_phar> <source_dir | source_file> [options]*
 
-To extract phar files use the -e command
+*options* switches:
 
-*phartools -e <phar_file> [extract_directory]*
+-zgzip|-zbzip2 Compress the phar file using gzip or bzip2 compression
+-m<metadata> Add metadata to the phar file (metadata format must be like 'key=>value,key2=>value2')
+-s<stub> Set stub string for the phar
+-r<regex> Include only files matching the regular expression
 
-If *extract_directory* is not specified, files will be extracted in the current directory
+#### Delete a file from a phar archive:
 
-**Example:**
+*phartools -d <phar_archive> <file>*
 
-phartools -e myphar.phar (Windows)
+*file* can be either a file or a directory.
 
-./phartools.sh -e myphar.phar (Linux)
+#### Extract a phar archive:
 
-###### Get Phar Info:
+*phartools -e <phar_archive> [extract_path]*
 
-To get some infos about a phar file use the -i command. You will get the size, the signature, the signature type, metadata, the stub and some other infos about the specified phar file
+If *extract_path* is not specified, the archive will be extracted in the current directory
 
-*phartools -i <phar_file>*
+#### Get informations of a phar archive:
 
-**Example:**
+*phartools -i <phar_archive>*
 
-phartools -i myphar.phar (Windows)
+#### List files inside a phar archive:
 
-./phartools.sh -i myphar.phar (Linux)
+*phartools -l <phar_archive>*
 
-###### Get PharTools Version:
+#### Rename a file into a phar archive:
 
-*phartools -v*
+*phartools -r <phar_archive> <oldname> <newname>*
 
-**Example:**
+#### Convert zip or tar archive to a phar archive:
 
-phartools -v (Windows)
+*phartools -a2p <archive> [compression]*
 
-./phartools.sh -v (Linux)
+Currently supported *compression* types are gzip and bzip2
+
+
+#### Convert a phar archive to a zip or tar archive:
+
+*phartools -p2a <phar_archive> [options]*
+
+*options* switches:
+-zgzip|-zbzip2 Set output compression type
+-ozip|-otar Set output archive type
 
 ## Available PharTools Downloads
 
 **All platforms:**
 
-PharTools_v1.0.zip (Only the script)
+PharTools_v2.0.zip (Script only)
 
 **Windows:**
 
-PharTools_v1.0_win_installer (Preconfigured Script + Precompiled PHP binaries)
-PharTools_v1.0_win_portable (Preconfigured Script + Precompiled PHP binaries, No Installer)
+PharTools_v2.0_win_installer (Preconfigured Script + Precompiled PHP binaries)
+PharTools_v2.0_win_portable (Preconfigured Script + Precompiled PHP binaries, No Installer)
 
 ***Please note that precompiled PHP binaries provided in the Portable and Installer versions are provided with minimal extensions and configuration***
 
-## Usage Example
+## Screenshots
 
-###### Windows
+#### Windows
 
 *1. Open Windows Command Shell*<br>
 ![1](https://cloud.githubusercontent.com/assets/10297075/7434716/2d8a500c-f03d-11e4-84c2-9ef8ab6fee5d.png)<br>
@@ -115,7 +120,7 @@ PharTools_v1.0_win_portable (Preconfigured Script + Precompiled PHP binaries, No
 *3. Run PharTools*<br>
 ![3](https://cloud.githubusercontent.com/assets/10297075/7434743/7b4bbf06-f03d-11e4-83df-493a92ac7075.png)<br>
 
-###### Linux
+#### Linux
 
 *1. Open Linux Terminal*<br>
 ![1 2](https://cloud.githubusercontent.com/assets/10297075/7435028/12525408-f040-11e4-8cf5-94f6e1a18bce.png)<br>
@@ -123,6 +128,11 @@ PharTools_v1.0_win_portable (Preconfigured Script + Precompiled PHP binaries, No
 ![2 2](https://cloud.githubusercontent.com/assets/10297075/7435029/12544d12-f040-11e4-9e9b-e6c44740926f.png)<br>
 *3. Run PharTools*<br>
 ![3 2](https://cloud.githubusercontent.com/assets/10297075/7435030/126e09dc-f040-11e4-84f2-d4c19d9ee5ae.png)<br>
+
+## Donate
+
+If you want you can support this project with a small donation by clicking [:dollar: here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=flavius.c.1999@gmail.com&lc=US&item_name=www.evolsoft.tk&no_note=0&cn=&curency_code=EUR&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted). 
+Your generosity will help us paying web hosting, domains, buying programs (such as IDEs, debuggers, etc...) and new hardware to improve software development. Thank you :smile:
 
 ## Contributing
 
