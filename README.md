@@ -53,9 +53,9 @@ If you are running PharTools on Windows you can simply run it calling *phartools
 
 *options* switches:
 
--zgzip|-zbzip2 Compress the phar file using gzip or bzip2 compression
--m&lt;metadata&gt; Add metadata to the phar file (metadata format must be like 'key=&gt;value,key2=&gt;value2')
--s&lt;stub&gt; Set stub string for the phar
+-zgzip|-zbzip2 Compress the phar file using gzip or bzip2 compression<br>
+-m&lt;metadata&gt; Add metadata to the phar file (metadata format must be like 'key=&gt;value,key2=&gt;value2')<br>
+-s&lt;stub&gt; Set stub string for the phar<br>
 -r&lt;regex&gt; Include only files matching the regular expression
 
 #### Delete a file from a phar archive:
@@ -94,7 +94,7 @@ Currently supported *compression* types are gzip and bzip2
 *phartools -p2a &lt;phar_archive&gt; [options]*
 
 *options* switches:
--zgzip|-zbzip2 Set output compression type
+-zgzip|-zbzip2 Set output compression type<br>
 -ozip|-otar Set output archive type
 
 ## Available PharTools Downloads
@@ -105,7 +105,7 @@ PharTools_v2.0.zip (Script only)
 
 **Windows:**
 
-PharTools_v2.0_win_installer (Preconfigured Script + Precompiled PHP binaries)
+PharTools_v2.0_win_installer (Preconfigured Script + Precompiled PHP binaries)<br>
 PharTools_v2.0_win_portable (Preconfigured Script + Precompiled PHP binaries, No Installer)
 
 ***Please note that precompiled PHP binaries provided in the Portable and Installer versions are provided with minimal extensions and configuration***
