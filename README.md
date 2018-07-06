@@ -1,6 +1,6 @@
 ![start2](https://cloud.githubusercontent.com/assets/10303538/6315586/9463fa5c-ba06-11e4-8f30-ce7d8219c27d.png)
 
-## PharTools
+# PharTools
 
 **PharTools** is a powerful PHP command-line tool to manage phar (PHP-Archive) files. It allows to create, extract, edit and view phar archives. It also includes a simple API to implement PharTools features on your own scripts.
 
