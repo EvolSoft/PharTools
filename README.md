@@ -238,8 +238,6 @@ include "path/to/phartools.php";
 PharTools::<api_function>();
 ```
 
-*See [documentation](https://www.evolsoft.tk/phartools/docs/) for API functions.*
-
 ## Screenshots
 
 ### Windows
