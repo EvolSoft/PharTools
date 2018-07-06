@@ -1,11 +1,10 @@
 <?php
 
 /*
- * PharTools (v2.0) by EvolSoft
+ * PharTools v2.1 by EvolSoft
  * Developer: Flavius12
  * Website: https://www.evolsoft.tk
- * Date: 03/04/2018 10:52 AM (UTC)
- * Copyright & License: (C) 2015, 2018 EvolSoft
+ * Copyright (C) 2015-2018 EvolSoft
  * Licensed under MIT (https://github.com/EvolSoft/PharTools/blob/master/LICENSE)
  */
 
@@ -15,40 +14,53 @@ error_reporting(E_NOTICE); //Comment this line to enable error reporting
  * PharTools main class
  * 
  * @author Flavius12
+ * 
  * @package PharTools
  */
 class PharTools {
     
     /** @var int */
     const ERROR = 0;
+    
     /** @var int */
     const SUCCESS = 1;
+    
     /** @var int */
     const ERR_INV_COMP = 2;
+    
     /** @var int */
     const ERR_META = 3;
+    
     /** @var int */
     const ERR_STUB = 4;
+    
     /** @var int */
     const ERR_RDONLY = 5;
+    
     /** @var int */
     const ERR_FILE_NOT_FOUND = 6;
+    
     /** @var int */
     const ERR_ARCH_NOT_FOUND = 7;
+    
+    /** @var int */
+    const ERR_INV_ARCH = 8;
+    
+    /** @var int */
+    const ERR_LAST_FILE = 9;
     
     /**
      * Create a phar archive
      * 
      * @param string $fname
-     * @param array $file
+     * @param array $files
      * @param int $comp
      * @param array $meta
      * @param string $stub
-     * @param string $regex
      * 
      * @return int
      */
-    public static function Create($arch, $file, $comp = null, $meta = null, $stub = null, $regex = null){
+    public static function Create($arch, $files, $comp = null, array $meta = null, $stub = null){
         if(!Phar::canWrite()) return self::ERR_RDONLY;
         if(file_exists($arch)){
             if(!@unlink($arch)){
@@ -56,6 +68,8 @@ class PharTools {
             }
         }
         $phar = new Phar($arch);
+        $status = self::_AddFile($phar, $files);
+        if($status != self::SUCCESS) return $status;
         if($comp){
             $status = self::SetCompression($phar, $comp);
             if($status != self::SUCCESS) return $status;
@@ -68,7 +82,30 @@ class PharTools {
             $status = self::SetStub($phar, $stub);
             if($status != self::SUCCESS) return $status;
         }
-        return self::_AddFile($phar, $file);
+        return self::SUCCESS;
+    }
+    
+    /**
+     * Open a phar archive
+     * 
+     * @param string $arch
+     * @param int $status
+     * 
+     * @return Phar
+     */
+    public static function Open($arch, &$status){
+        if(!file_exists($arch) || is_dir($arch)){
+            $status = self::ERR_ARCH_NOT_FOUND;
+            return null;
+        }
+        try{
+            $phar = new Phar($arch);
+            $status = self::SUCCESS;
+            return $phar;
+        }catch(UnexpectedValueException $ex){
+            $status = self::ERR_INV_ARCH;
+            return null;
+        }
     }
     
     /**
@@ -131,15 +168,14 @@ class PharTools {
      */
     public static function MkDir($arch, $dir){
         if(!Phar::canWrite()) return self::ERR_RDONLY;
-        if(!file_exists($arch) || is_dir($arch)){
-            return self::ERR_ARCH_NOT_FOUND;
-        }
-        $phar = new Phar($arch);
+        $status = null;
+        $phar = self::Open($arch, $status);
+        if($status != self::SUCCESS) return $status;
         return self::_MkDir($phar, $dir);
     }
     
     /**
-     * Make directory inside the phar archive
+     * Make a directory inside the phar archive
      *
      * @param Phar $phar
      * @param string $dir
@@ -157,41 +193,24 @@ class PharTools {
     }
     
     /**
-     * @internal
-     *
-     * Recursively add files into phar archive
-     *
-     * @param string $path
-     */
-    private static function RecAddFiles(Phar $phar, $path){
-        foreach(glob($path) as $entry){
-            if(is_dir($entry)){
-                self::RecAddFiles($phar, $entry . "/*");
-            }else{
-                $phar->addFile($entry);
-            }
-        }
-    }
-    
-    /**
-     * Add a file into the phar archive
+     * Add file(s) into the phar archive
      *
      * @param string $arch
      * @param string $file
+     * @param callable $callback
      * 
      * @return int
      */
     public static function AddFile($arch, $file){
         if(!Phar::canWrite()) return self::ERR_RDONLY;
-        if(!file_exists($arch) || is_dir($arch)){
-            return self::ERR_ARCH_NOT_FOUND;
-        }
-        $phar = new Phar($arch);
+        $status = null;
+        $phar = self::Open($arch, $status);
+        if($status != self::SUCCESS) return $status;
         return self::_AddFile($phar, $file);
     }
     
     /**
-     * Add a file into the phar archive
+     * Add file(s) into the phar archive
      *
      * @param Phar $phar
      * @param string $file
@@ -200,15 +219,18 @@ class PharTools {
      */
     public static function _AddFile(Phar $phar, $file){
         if(!Phar::canWrite()) return self::ERR_RDONLY;
-        if(file_exists($file)){
-            if(is_dir($file)){
-                self::RecAddFiles($phar, $file . "/*");
-                return self::SUCCESS;
-            }
-            $phar->addFile($file);
-            return self::SUCCESS;
+        $glob = glob($file);
+        if(empty($glob)){
+            return self::ERR_FILE_NOT_FOUND;
         }
-        return self::ERR_FILE_NOT_FOUND;
+        foreach($glob as $f){
+            if(is_dir($f)){
+                $phar->buildFromIterator(new RecursiveIteratorIterator(new RecursiveDirectoryIterator(getcwd() . "/" . $f . "/", FilesystemIterator::SKIP_DOTS)), "./");
+            }else{
+                $phar->addFile($f);
+            }
+        }
+        return self::SUCCESS;
     }
     
     /**
@@ -218,15 +240,20 @@ class PharTools {
      *
      * @param string $path
      * @param int $status
+     * 
      */
-    private static function RecDeleteFiles($path, &$status){
-        $p = new Phar($path);
-        foreach($p as $entry){
+    private static function RecDeleteFiles(Phar $phar, $path, &$status){
+        $entries = new DirectoryIterator($path);
+        foreach($entries as $entry){
             if($entry->isDir()){
-                self::RecDeleteFiles($entry->getPathname(), $status);
+                self::RecDeleteFiles($phar, $entry->getPathname(), $status);
             }else{
-                if($status){
-                    $status = unlink($entry);
+                if($status == self::SUCCESS){
+                    if($phar->count() == 1){
+                        $status = self::ERR_LAST_FILE;
+                        return;
+                    }
+                    $status = unlink($entry->getPathname()) ? self::SUCCESS : self::ERROR;
                 }
             }
         }
@@ -242,18 +269,34 @@ class PharTools {
      */
     public static function DeleteFile($arch, $file){
         if(!Phar::canWrite()) return self::ERR_RDONLY;
-        if(!file_exists($arch) || is_dir($arch)){
-            return self::ERR_ARCH_NOT_FOUND;
-        }
-        $phar = new Phar($arch);
+        $status = null;
+        $phar = self::Open($arch, $status);
+        if($status != self::SUCCESS) return $status;
+        return self::_DeleteFile($phar, $file);
+    }
+    
+    /**
+     * Delete a file inside the phar archive
+     *
+     * @param Phar $phar
+     * @param string $file
+     *
+     * @return int
+     */
+    public static function _DeleteFile(Phar $phar, $file){
+        if(!Phar::canWrite()) return self::ERR_RDONLY;
         $path = "phar://" . $phar->getPath() . "/";
-        if(is_dir($path . $file)){
-            $status = true;
-            self::RecDeleteFiles($path . $file . "/", $status);
-            if(!$status) return self::ERROR;
-            return self::SUCCESS;
+        if(!file_exists($path . $file)){
+            return self::ERR_FILE_NOT_FOUND;
+        }else if(is_dir($path . $file)){
+            $status = self::SUCCESS;
+            self::RecDeleteFiles($phar, $path . $file . "/", $status);
+            return $status;
         }
         try{
+            if($phar->count() == 1){
+                return self::ERR_LAST_FILE;
+            }
             $phar->delete($file);
             return self::SUCCESS;
         }catch(Exception $ex){
@@ -272,10 +315,9 @@ class PharTools {
      */
     public static function RenameFile($arch, $file, $newname){
         if(!Phar::canWrite()) return self::ERR_RDONLY;
-        if(!file_exists($arch) || is_dir($arch)){
-            return self::ERR_ARCH_NOT_FOUND;
-        }
-        $phar = new Phar($arch);
+        $status = null;
+        $phar = self::Open($arch, $status);
+        if($status != self::SUCCESS) return $status;
         return self::_RenameFile($phar, $file, $newname);
     }
     
@@ -307,13 +349,26 @@ class PharTools {
      * @return int
      */
     public static function Extract($arch, &$dest = null){
+        $status = null;
+        $phar = self::Open($arch, $status);
+        if($status != self::SUCCESS) return $status;
+        return self::_Extract($phar, $dest);
+    }
+    
+    /**
+     * Extract a phar archive
+     *
+     * @param Phar $phar
+     * @param string|null $dest
+     *
+     * @return int
+     */
+    public static function _Extract(Phar $phar, &$dest = null){
         if(!$dest){
             $dest = getcwd();
+        }else{
+            $dest = getcwd() . DIRECTORY_SEPARATOR . $dest;
         }
-        if(!file_exists($arch) || is_dir($arch)){
-            return self::ERR_ARCH_NOT_FOUND;
-        }
-        $phar = new Phar($arch);
         if(!is_dir($dest)){
             $dir = @mkdir($dest);
             $dest = realpath($dest);
@@ -368,11 +423,10 @@ class PharTools {
         if(!Phar::canCompress($comp)){
             return self::ERR_INV_COMP;
         }
-        if(!file_exists($arch) || is_dir($arch)){
-            return self::ERR_ARCH_NOT_FOUND;
-        }
+        $status = null;
+        $phar = self::Open($arch, $status);
+        if($status != self::SUCCESS) return $status;
         try{
-            $phar = new Phar($arch);
             $phar->convertToData($fmt, $comp);
             return self::SUCCESS;
         }catch(Exception $ex){
@@ -389,10 +443,9 @@ class PharTools {
      * @return array
      */
     public static function GetPharInfo($arch, &$info){
-        if(!file_exists($arch) || is_dir($arch)){
-            return self::ERR_ARCH_NOT_FOUND;
-        }
-        $phar = new Phar($arch);
+        $status = null;
+        $phar = self::Open($arch, $status);
+        if($status != self::SUCCESS) return $status;
         $info["filename"] = $arch;
         $info["filesize"] = filesize($arch);
         $info["signature"] = $phar->getSignature();
@@ -423,7 +476,7 @@ class PharTools {
      * @return string
      */
     public static function GetVersion(){
-        return "2.0";
+        return "2.1";
     }
 }
 
@@ -431,6 +484,7 @@ class PharTools {
  * PharTools CLI helper class
  *
  * @author Flavius12
+ * 
  * @package PharTools
  */
 class PharToolsHelper {
@@ -498,20 +552,6 @@ class PharToolsHelper {
     }
     
     /**
-     * Check if RegEx is valid
-     *
-     * @param string $exp
-     *
-     * @return bool
-     */
-    public static function IsRegexValid($exp){
-        if(@preg_match($exp, "") === false){
-            return false;
-        }
-        return true;
-    }
-    
-    /**
      * Append phar archive extension if missing
      *
      * @param string $str
@@ -524,31 +564,20 @@ class PharToolsHelper {
     }
     
     /**
-     * Check if the specified file is a phar archive
-     * 
-     * @param string $str
-     * 
-     * @return bool
-     */
-    public static function isPharArchive($str){
-        return strtolower(substr($str, -5)) == ".phar" && file_exists($str) && !is_dir($str);
-    }
-    
-    /**
      * Print help screen
      */
     public static function PrintHelp(){
         echo "Usage:\n";
-        echo "  -a <phar_archive> <file> Add a file to the phar archive\n";
-        echo "  -c <destination_phar> <source_dir | source_file> [options] Create a phar archive\n";
-        echo "  -d <phar_archive> <file> Delete a file from the phar archive\n";
+        echo "  -a <phar_archive> <files> Add files to a phar archive\n";
+        echo "  -c <phar_archive> <files> [options] Create a phar archive\n";
+        echo "  -d <phar_archive> <file> Delete a file from a phar archive\n";
         echo "  -e <phar_archive> [extract_path] Extract a phar archive\n";
         echo "  -h Show this help screen\n";
         echo "  -i <phar_archive> Show info about a phar archive\n";
-        echo "  -l <phar_archive> List files inside a phar archive\n";
+        echo "  -l <phar_archive> List the content of a phar archive\n";
         echo "  -r <phar_archive> <oldname> <newname> Rename a file inside a phar archive\n";
-        echo "  -a2p <archive> [compression] Converts a zip or tar archive to a phar archive\n";
-        echo "  -p2a <phar_archive> [options] Converts a phar archive to a zip or tar archive\n";
+        echo "  -a2p <archive> [compression] Convert a zip or tar archive to a phar archive\n";
+        echo "  -p2a <phar_archive> [options] Convert a phar archive to a zip or tar archive\n";
     }
     
     /**
@@ -573,47 +602,44 @@ class PharToolsHelper {
     }
     
     /**
-     * Add files inside phar recursively
+     * Add file(s) inside phar
      *
      * @param string $arch
      * @param string $path
      * 
      * @return int
      */
-    public static function RecursiveAdd($arch, $path){
-        static $phar;
-        static $fcount = 0;
-        $sub = false;
-        if(!$phar){
-            if(!file_exists($arch)){
+    public static function AddFiles($arch, $path){
+        $status = null;
+        $phar = PharTools::Open($arch, $status);
+        switch($status){
+            case PharTools::SUCCESS:
+                $entries = glob($path);
+                foreach($entries as $entry){
+                    $pharpath = "phar://" . $phar->getPath() . "/";
+                    if(file_exists($pharpath . $entry)){
+                        echo $entry . " already exists in the phar archive. Overwrite it (y, n)? ";
+                        $input = fopen("php://stdin","r");
+                        $line = strtolower(fgets($input));
+                        if(trim($line) != 'y'){
+                            goto skip;
+                        }
+                    }
+                    if(PharTools::_AddFile($phar, $entry) == PharTools::SUCCESS){
+                        echo (is_dir($entry) ? "Directory " : "File ") . $entry . " added to " . $arch . "\n";
+                    }else{
+                        echo "Failed to add " . $entry . " to " . $arch . ".\n";
+                    }
+                    skip:
+                }
+                return 0;
+            case PharTools::ERR_ARCH_NOT_FOUND:
                 echo "Phar archive not found.\n";
                 return 1;
-            }
-            if(!file_exists($path)){
-                echo "Failed to add " . $path . " to " . $arch . ".\n";
+            case PharTools::ERR_INV_ARCH:
+                echo "The specified file is not a valid phar archive.\n";
                 return 1;
-            }
-            $phar = new Phar($arch);
-        }else{
-            $sub = true;
         }
-        $entries = glob($path);
-        foreach($entries as $entry){
-            if(is_dir($entry)){
-                self::RecursiveAdd($arch, $entry . "/*");
-            }else{
-                $fcount++;
-                if(PharTools::_AddFile($phar, $entry) == PharTools::SUCCESS){
-                    echo "File " . $entry . " added to " . $arch . ".\n";
-                }else{
-                    echo "Failed to add " . $entry . " to " . $arch . ".\n";
-                }
-            }
-        }
-        if(!$sub && $fcount == 0){
-            echo "Failed to add " . $path . " to " . $arch . ": directory is empty.\n";
-        }
-        return 0;
     }
     
     /**
@@ -655,11 +681,11 @@ class PharToolsHelper {
 
 //If the script is called from command line, execute it
 if(isset($argv[0])){
-    main($argc, $argv);
+    return main($argc, $argv);
 }
 
 function main($argc, $argv){
-    echo "\nEvolSoft PharTools v" . PharTools::GetVersion() . "\nCopyright (C) 2015, 2018 EvolSoft. Licensed under MIT.\n\n";
+    echo "\nEvolSoft PharTools v" . PharTools::GetVersion() . "\nCopyright (C) 2015-2018 EvolSoft. Licensed under MIT.\n\n";
     if(!PharTools::IsPharSupported()){
         echo "Error: PharTools requires PHP version >= 5.3.0\n";
         return 1;
@@ -682,16 +708,11 @@ function main($argc, $argv){
                 PharToolsHelper::PrintReadOnlyError();
                 return 1;
             }
-            if(!PharToolsHelper::isPharArchive($argv[2])){
-                echo "Phar archive not found.\n";
-                return 1;
-            }
-            return PharToolsHelper::RecursiveAdd($argv[2], $argv[3]);
+            return PharToolsHelper::AddFiles($argv[2], $argv[3]);
         case "-c":
             $comp = null;
             $meta = null;
             $stub = null;
-            $regex = null;
             $ext = null;
             if(!isset($argv[3])){
                 echo "Please specify source files.\n";
@@ -704,8 +725,6 @@ function main($argc, $argv){
                     $meta = substr($argv[$i], 2, strlen($argv[$i]) - 2);
                 }else if(strncasecmp($argv[$i], "-s", 2) == 0){
                     $stub = substr($argv[$i], 2, strlen($argv[$i]) - 2);
-                }else if(strncasecmp($argv[$i], "-r", 2) == 0){
-                    $regex = substr($argv[$i], 2, strlen($argv[$i]) - 2);
                 }else{
                     PharToolsHelper::PrintInvalidCommand();
                     return 1;
@@ -728,11 +747,8 @@ function main($argc, $argv){
                         return 1;
                 }
             }
-            if($regex){
-                if(!IsRegexValid($regex)){
-                    echo "Invalid regular expression specified.\n";
-                    return 1;
-                }
+            if($meta){
+                $meta = PharToolsHelper::StringToMetadata($meta);
             }
             $arch = PharToolsHelper::appendFileExtension($argv[2]);
             if(file_exists($arch . $ext)){
@@ -740,18 +756,22 @@ function main($argc, $argv){
                 $input = fopen("php://stdin","r");
                 $line = strtolower(fgets($input));
                 if(trim($line) != 'y'){
+                    echo "Phar archive creation cancelled.\n";
                     return 0;
                 }
                 echo "Overwriting phar archive...\n";
             }else{
                 echo "Creating phar archive...\n";
             }
-            switch(PharTools::Create($arch . $ext, $argv[3], $comp, $meta, $stub, $regex)){
+            switch(PharTools::Create($arch . $ext, $argv[3], $comp, $meta, $stub)){
                 case PharTools::SUCCESS:
                     echo "Phar archive " . $arch . $ext . " created successfully.\n";
                     return 0;
                 case PharTools::ERR_RDONLY:
                     PharToolsHelper::PrintReadOnlyError();
+                    return 1;
+                case PharTools::ERR_FILE_NOT_FOUND:
+                    echo "Source file(s) not found.\n";
                     return 1;
                 case PharTools::ERR_INV_COMP:
                     echo "Unsupported compression type.\n";
@@ -785,6 +805,12 @@ function main($argc, $argv){
                 case PharTools::ERR_ARCH_NOT_FOUND:
                     echo "Phar archive not found.\n";
                     return 1;
+                case PharTools::ERR_INV_ARCH:
+                    echo "The specified file is not a valid phar archive.\n";
+                    return 1;
+                case PharTools::ERR_LAST_FILE:
+                    echo "Failed to delete " . $argv[3] . " from " . $argv[2] . ". The archive cannot be empty.\n";
+                    return 1;
                 default:
                 case PharTools::ERROR:
                     echo "Failed to delete " . $argv[3] . " from " . $argv[2] . ".\n";
@@ -799,22 +825,30 @@ function main($argc, $argv){
                 PharToolsHelper::PrintInvalidCommand();
                 return 0;
             }
-            if(isset($argv[3])){
-                $dest = $argv[3];
-            }
-            if(!PharToolsHelper::isPharArchive($argv[2])){
-                echo "Phar archive not found.\n";
-                return 1;
-            }
-            echo "Extracting " . $argv[2] . "...\n";
-            switch(PharTools::Extract($argv[2], $dest)){
-                default:
-                case PharTools::ERROR:
-                    echo "An error has occurred while extracting the phar archive.\n";
-                    return 1;
+            $status = null;
+            $phar = PharTools::Open($argv[2], $status);
+            switch($status){
                 case PharTools::SUCCESS:
-                    echo "Extracted in " . $dest . "\n";
+                    if(isset($argv[3])){
+                        $dest = $argv[3];
+                    }
+                    echo "Extracting " . $argv[2] . "...\n";
+                    switch(PharTools::_Extract($phar, $dest)){
+                        case PharTools::SUCCESS:
+                            echo "Extracted in " . $dest . "\n";
+                            return 0;
+                        default:
+                        case PharTools::ERROR:
+                            echo "An error has occurred while extracting the phar archive.\n";
+                            return 1;
+                    }
                     return 0;
+                case PharTools::ERR_ARCH_NOT_FOUND:
+                    echo "Phar archive not found.\n";
+                    return 1;
+                case PharTools::ERR_INV_ARCH:
+                    echo "The specified file is not a valid phar archive.\n";
+                    return 1;
             }
         case "-h":
         case "?":
@@ -829,34 +863,39 @@ function main($argc, $argv){
                 return 0;
             }
             $info = array();
-            if(PharTools::GetPharInfo($argv[2], $info) == PharTools::ERR_ARCH_NOT_FOUND){
-                echo "Phar archive not found.\n";
-                return 1;
+            switch(PharTools::GetPharInfo($argv[2], $info)){
+                case PharTools::SUCCESS:
+                    echo "Archive name: " . $argv[2] . "\n";
+                    if($info["filesize"] > 1024){
+                        echo "Size: " . PharToolsHelper::FormatSize($info["filesize"]) . " (" . number_format($info["filesize"], 0, ',', '.') . " bytes)\n";
+                    }else{
+                        echo "Size: " . PharToolsHelper::FormatSize($info["filesize"]) . "\n";
+                    }
+                    echo "Signature: " . $info["signature"]["hash"] . "\n";
+                    echo "Signature type: " . $info["signature"]["hash_type"] . "\n";
+                    echo "Version: " . $info["version"] . "\n";
+                    echo "Writable: " . PharToolsHelper::strbool($info["writable"]) . "\n";
+                    echo "Readable: " . PharToolsHelper::strbool($info["readable"]) . "\n";
+                    if($info["metadata"]){
+                        $metadata = PharToolsHelper::MetadataToString($info["metadata"]);
+                    }else{
+                        $metadata = "No metadata found.\n";
+                    }
+                    echo "Metadata: " . $metadata;
+                    echo "Show stub (y, n)? ";
+                    $input = fopen("php://stdin","r");
+                    $line = strtolower(fgets($input));
+                    if(trim($line) == 'y'){
+                        echo $info["stub"] . "\n";
+                    }
+                    return 0;
+                case PharTools::ERR_ARCH_NOT_FOUND:
+                    echo "Phar archive not found.\n";
+                    return 1;
+                case PharTools::ERR_INV_ARCH:
+                    echo "The specified file is not a valid phar archive.\n";
+                    return 1;
             }
-            echo "File: " . $argv[2] . "\n";
-            if($info["filesize"] > 1024){
-                echo "Size: " . PharToolsHelper::FormatSize($info["filesize"]) . " (" . number_format($info["filesize"], 0, ',', '.') . " bytes)\n";
-            }else{
-                echo "Size: " . PharToolsHelper::FormatSize($info["filesize"]) . "\n";
-            }
-            echo "Signature: " . $info["signature"]["hash"] . "\n";
-            echo "Signature type: " . $info["signature"]["hash_type"] . "\n";
-            echo "Version: " . $info["version"] . "\n";
-            echo "Writable: " . PharToolsHelper::strbool($info["writable"]) . "\n";
-            echo "Readable: " . PharToolsHelper::strbool($info["readable"]) . "\n";
-            if($info["metadata"]){
-                $metadata = PharToolsHelper::MetadataToString($info["metadata"]);
-            }else{
-                $metadata = "No metadata found.\n";
-            }
-            echo "Metadata: " . $metadata;
-            echo "Show stub (y, n)? ";
-            $input = fopen("php://stdin","r");
-            $line = strtolower(fgets($input));
-            if(trim($line) == 'y'){
-                echo $info["stub"] . "\n";
-            }
-            return 0;
         case "-l":
             if(!isset($argv[2])){
                 echo "Please specify a phar archive.\n";
@@ -865,12 +904,19 @@ function main($argc, $argv){
                 PharToolsHelper::PrintInvalidCommand();
                 return 0;
             }
-            if(!PharToolsHelper::isPharArchive($argv[2])){
-                echo "Phar archive not found.\n";
-                return 1;
+            $status = null;
+            $phar = PharTools::Open($argv[2], $status);
+            switch($status){
+                case PharTools::SUCCESS:
+                    PharToolsHelper::ListContent($phar);
+                    break;
+                case PharTools::ERR_ARCH_NOT_FOUND:
+                    echo "Phar archive not found.\n";
+                    return 1;
+                case PharTools::ERR_INV_ARCH:
+                    echo "The specified file is not a valid phar archive.\n";
+                    return 1;
             }
-            $phar = new Phar($argv[2]);
-            PharToolsHelper::ListContent($phar);
             return 0;
         case "-r":
             if(!isset($argv[2])){
@@ -889,6 +935,9 @@ function main($argc, $argv){
                     return 1;
                 case PharTools::ERR_ARCH_NOT_FOUND:
                     echo "Phar archive not found.\n";
+                    return 1;
+                case PharTools::ERR_INV_ARCH:
+                    echo "The specified file is not a valid phar archive.\n";
                     return 1;
                 case PharTools::ERR_FILE_NOT_FOUND:
                     echo "File " . $argv[3] . " not found into the phar archive.\n";
@@ -954,7 +1003,7 @@ function main($argc, $argv){
                 }else if(strncasecmp($argv[$i], "-o", 2) == 0){
                     $fmt = substr($argv[$i], 2, strlen($argv[$i]) - 2);
                 }else{
-                    PrintInvalidCommand();
+                    PharToolsHelper::PrintInvalidCommand();
                     return 1;
                 }
             }
@@ -999,6 +1048,9 @@ function main($argc, $argv){
                     return 0;
                 case PharTools::ERR_ARCH_NOT_FOUND:
                     echo "Phar archive not found.\n";
+                    return 1;
+                case PharTools::ERR_INV_ARCH:
+                    echo "The specified file is not a valid phar archive.\n";
                     return 1;
                 case PharTools::ERR_INV_COMP:
                     echo "Unsupported compression type.\n";
