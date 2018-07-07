@@ -158,12 +158,6 @@ Parameters:
 <phar_archive> is the destination phar archive
 ```
 
-It will print:
-
-```
-$ phartools -i <phar_archive>
-```
-
 ### -l (list archive content) command
 
 Lists the content of a phar archive.
