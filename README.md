@@ -257,7 +257,7 @@ PharTools::<api_function>();
 
 ## Donate
 
-If you want you can support this project with a small donation by clicking [:dollar: here](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=flavius.c.1999@gmail.com&lc=US&item_name=www.evolsoft.tk&no_note=0&cn=&curency_code=EUR&bn=PP-DonationsBF:btn_donateCC_LG.gif:NonHosted). 
+If you want you can support this project with a small donation by clicking [:dollar: here](https://paypal.me/Flavius12). 
 Your generosity will help us paying web hosting, domains, buying programs (such as IDEs, debuggers, etc...) and new hardware to improve software development. Thank you :smile:
 
 ## Contributing
